@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  apache:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    volumes:
+      - ../velion-web:/var/www/html
+      # - ../velion-web/doc:/var/www/html/doc  # Añadir este volumen para el directorio doc
+    # environment:
+    #   APACHE_RUN_USER: www-data
+    #   APACHE_RUN_GROUP: www-data
+    # command: >
+    #   bash -c "chown -R www-data:www-data /var/www/html/doc &&
+    #            chmod -R 755 /var/www/html/doc &&
+    #            apache2-foreground"
+    restart: always
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: mysql
+      MYSQL_ROOT_PASSWORD: root
+    restart: always
+
+  mysql:
+    image: mysql:latest
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: always
+
+volumes:
+  db_data:

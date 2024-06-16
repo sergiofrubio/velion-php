@@ -1,0 +1,46 @@
+ /* Estilos de userdetail.php */
+ .profile-header {
+   background: url('https://via.placeholder.com/1200x400') no-repeat center center;
+   background-size: cover;
+   height: 250px;
+   position: relative;
+ }
+
+ .profile-picture {
+   width: 150px;
+   height: 150px;
+   border-radius: 50%;
+   border: 5px solid #fff;
+   position: absolute;
+   bottom: -75px;
+   left: 20px;
+ }
+
+ .profile-info {
+   margin-top: 80px;
+ }
+
+ .profile-info h1 {
+   margin-bottom: 0;
+ }
+
+ .profile-info p {
+   color: #6c757d;
+ }
+
+ .nav-pills .nav-link {
+   border-radius: 0;
+   color: #495057;
+ }
+
+ .nav-pills .nav-link.active {
+   background-color: #0d6efd;
+ }
+
+ .content-section {
+   margin-top: 30px;
+ }
+
+ .table-responsive {
+   overflow-x: hidden;
+ }

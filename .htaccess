@@ -1,0 +1,9 @@
+RewriteEngine On
+
+# Redirigir todas las solicitudes de api a la carpeta service/api.php
+RewriteRule ^api/(.*)$ service/api.php [QSA,L]
+
+# Redirigir todas las demás solicitudes a index.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [QSA,L]
