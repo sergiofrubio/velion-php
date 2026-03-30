@@ -7,7 +7,7 @@ RUN docker-php-ext-install mysqli
  RUN a2enmod rewrite
 
 # # Copiar el contenido del proyecto al contenedor
-# COPY . /var/www/html/
+COPY . . /var/www/html/
 
 # # Configurar permisos adecuados
-# RUN chown -R www-data:www-data /var/www/html/
+RUN chown -R www-data:www-data /var/www/html/
