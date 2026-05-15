@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 10-05-2026 a las 17:17:30
+-- Tiempo de generación: 15-05-2026 a las 19:02:24
 -- Versión del servidor: 8.0.44
 -- Versión de PHP: 8.3.26
 
@@ -24,10 +24,10 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `ausencias`
+-- Estructura de tabla para la tabla `ausencias_terapeutas`
 --
 
-CREATE TABLE `ausencias` (
+CREATE TABLE `ausencias_terapeutas` (
   `ausencia_id` int NOT NULL,
   `fisioterapeuta_id` varchar(9) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `fecha_inicio` date NOT NULL,
@@ -146,6 +146,25 @@ CREATE TABLE `clinicas` (
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `contratos`
+--
+
+CREATE TABLE `contratos` (
+  `contrato_id` int NOT NULL,
+  `usuario_id` varchar(9) NOT NULL,
+  `fecha_inicio` date NOT NULL,
+  `fecha_fin` date DEFAULT NULL,
+  `tipo_contrato` varchar(50) DEFAULT 'Indefinido',
+  `salario_base_mensual` decimal(10,2) NOT NULL,
+  `complementos_mensuales` decimal(10,2) DEFAULT '0.00',
+  `pagas_extra` int DEFAULT '2' COMMENT '12 pagas + 2 extras = 14',
+  `irpf_porcentaje` decimal(5,2) DEFAULT '15.00',
+  `activo` tinyint(1) DEFAULT '1'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `cuentas_clientes`
 --
 
@@ -168,6 +187,19 @@ CREATE TABLE `cuentas_clientes` (
 
 INSERT INTO `cuentas_clientes` (`cuenta_id`, `nombre_empresa`, `nif_cif`, `slug`, `plan_suscripcion`, `estado_cuenta`, `email_admin`, `fecha_alta`, `fecha_renovacion`, `configuracion_json`) VALUES
 (1, 'Fisioterapia Avanzada S.L.', 'B12345678', 'fisio-avanzada', 'Profesional', 'Activo', 'contacto@fisioavanzada.com', '2026-05-09 20:56:55', NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `empleados`
+--
+
+CREATE TABLE `empleados` (
+  `usuario_id` varchar(9) NOT NULL,
+  `nss` varchar(12) DEFAULT NULL COMMENT 'Número Seguridad Social',
+  `iban` varchar(24) DEFAULT NULL,
+  `grupo_cotizacion` int DEFAULT '1'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -295,10 +327,10 @@ INSERT INTO `historiales_medicos` (`historial_id`, `paciente_id`, `fisioterapeut
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `horarios`
+-- Estructura de tabla para la tabla `horarios_terapeutas`
 --
 
-CREATE TABLE `horarios` (
+CREATE TABLE `horarios_terapeutas` (
   `horario_id` int NOT NULL,
   `fisioterapeuta_id` varchar(9) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `dia_semana` enum('Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
@@ -311,10 +343,10 @@ CREATE TABLE `horarios` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Volcado de datos para la tabla `horarios`
+-- Volcado de datos para la tabla `horarios_terapeutas`
 --
 
-INSERT INTO `horarios` (`horario_id`, `fisioterapeuta_id`, `dia_semana`, `hora_inicio`, `hora_fin`, `creado_por`, `fecha_creacion`, `modificado_por`, `fecha_modificacion`) VALUES
+INSERT INTO `horarios_terapeutas` (`horario_id`, `fisioterapeuta_id`, `dia_semana`, `hora_inicio`, `hora_fin`, `creado_por`, `fecha_creacion`, `modificado_por`, `fecha_modificacion`) VALUES
 (1, '234567890', 'Lunes', '09:00:00', '18:30:00', NULL, '2026-05-10 16:33:30', NULL, NULL);
 
 -- --------------------------------------------------------
@@ -336,6 +368,30 @@ CREATE TABLE `metodos_pago` (
   `fecha_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `modificado_por` varchar(9) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `fecha_modificacion` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `nominas`
+--
+
+CREATE TABLE `nominas` (
+  `nomina_id` int NOT NULL,
+  `contrato_id` int NOT NULL,
+  `mes` int NOT NULL,
+  `anio` int NOT NULL,
+  `fecha_emision` date NOT NULL,
+  `devengos_base` decimal(10,2) NOT NULL,
+  `devengos_complementos` decimal(10,2) DEFAULT '0.00',
+  `devengos_total_bruto` decimal(10,2) NOT NULL,
+  `deduccion_seguridad_social_trabajador` decimal(10,2) NOT NULL,
+  `deduccion_irpf` decimal(10,2) NOT NULL,
+  `deducciones_total` decimal(10,2) NOT NULL,
+  `liquido_a_percibir` decimal(10,2) NOT NULL,
+  `coste_seguridad_social_empresa` decimal(10,2) NOT NULL,
+  `estado` enum('Pendiente','Pagada') DEFAULT 'Pendiente',
+  `pdf_path` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
@@ -425,9 +481,9 @@ INSERT INTO `usuarios` (`usuario_id`, `nombre`, `apellidos`, `telefono`, `fecha_
 --
 
 --
--- Indices de la tabla `ausencias`
+-- Indices de la tabla `ausencias_terapeutas`
 --
-ALTER TABLE `ausencias`
+ALTER TABLE `ausencias_terapeutas`
   ADD PRIMARY KEY (`ausencia_id`),
   ADD KEY `fisioterapeuta_id` (`fisioterapeuta_id`),
   ADD KEY `fk_ausencia_creador` (`creado_por`),
@@ -471,6 +527,13 @@ ALTER TABLE `clinicas`
   ADD UNIQUE KEY `email_contacto` (`email_contacto`);
 
 --
+-- Indices de la tabla `contratos`
+--
+ALTER TABLE `contratos`
+  ADD PRIMARY KEY (`contrato_id`),
+  ADD KEY `fk_contrato_usuario` (`usuario_id`);
+
+--
 -- Indices de la tabla `cuentas_clientes`
 --
 ALTER TABLE `cuentas_clientes`
@@ -478,6 +541,12 @@ ALTER TABLE `cuentas_clientes`
   ADD UNIQUE KEY `uk_nif_cif` (`nif_cif`),
   ADD UNIQUE KEY `uk_slug` (`slug`),
   ADD UNIQUE KEY `uk_email_admin` (`email_admin`);
+
+--
+-- Indices de la tabla `empleados`
+--
+ALTER TABLE `empleados`
+  ADD PRIMARY KEY (`usuario_id`);
 
 --
 -- Indices de la tabla `especialidades`
@@ -515,9 +584,9 @@ ALTER TABLE `historiales_medicos`
   ADD KEY `modificado_por` (`modificado_por`);
 
 --
--- Indices de la tabla `horarios`
+-- Indices de la tabla `horarios_terapeutas`
 --
-ALTER TABLE `horarios`
+ALTER TABLE `horarios_terapeutas`
   ADD PRIMARY KEY (`horario_id`),
   ADD KEY `fisioterapeuta_id` (`fisioterapeuta_id`),
   ADD KEY `fk_horario_creador` (`creado_por`),
@@ -531,6 +600,13 @@ ALTER TABLE `metodos_pago`
   ADD KEY `fk_usuario_id` (`usuario_id`),
   ADD KEY `fk_metodos_creador` (`creado_por`),
   ADD KEY `fk_metodos_modificador` (`modificado_por`);
+
+--
+-- Indices de la tabla `nominas`
+--
+ALTER TABLE `nominas`
+  ADD PRIMARY KEY (`nomina_id`),
+  ADD KEY `fk_nomina_contrato` (`contrato_id`);
 
 --
 -- Indices de la tabla `pacientes`
@@ -568,9 +644,9 @@ ALTER TABLE `usuarios`
 --
 
 --
--- AUTO_INCREMENT de la tabla `ausencias`
+-- AUTO_INCREMENT de la tabla `ausencias_terapeutas`
 --
-ALTER TABLE `ausencias`
+ALTER TABLE `ausencias_terapeutas`
   MODIFY `ausencia_id` int NOT NULL AUTO_INCREMENT;
 
 --
@@ -598,6 +674,12 @@ ALTER TABLE `clinicas`
   MODIFY `id_clinica` int NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT de la tabla `contratos`
+--
+ALTER TABLE `contratos`
+  MODIFY `contrato_id` int NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `cuentas_clientes`
 --
 ALTER TABLE `cuentas_clientes`
@@ -622,9 +704,9 @@ ALTER TABLE `historiales_medicos`
   MODIFY `historial_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
--- AUTO_INCREMENT de la tabla `horarios`
+-- AUTO_INCREMENT de la tabla `horarios_terapeutas`
 --
-ALTER TABLE `horarios`
+ALTER TABLE `horarios_terapeutas`
   MODIFY `horario_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
@@ -632,6 +714,12 @@ ALTER TABLE `horarios`
 --
 ALTER TABLE `metodos_pago`
   MODIFY `metodo_id` int NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `nominas`
+--
+ALTER TABLE `nominas`
+  MODIFY `nomina_id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `pagos`
@@ -650,9 +738,9 @@ ALTER TABLE `password_resets`
 --
 
 --
--- Filtros para la tabla `ausencias`
+-- Filtros para la tabla `ausencias_terapeutas`
 --
-ALTER TABLE `ausencias`
+ALTER TABLE `ausencias_terapeutas`
   ADD CONSTRAINT `fk_ausencia_creador` FOREIGN KEY (`creado_por`) REFERENCES `usuarios` (`usuario_id`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_ausencia_fisio` FOREIGN KEY (`fisioterapeuta_id`) REFERENCES `usuarios` (`usuario_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_ausencia_modificador` FOREIGN KEY (`modificado_por`) REFERENCES `usuarios` (`usuario_id`) ON DELETE SET NULL ON UPDATE CASCADE;
@@ -683,6 +771,18 @@ ALTER TABLE `citas`
   ADD CONSTRAINT `fk_citas_bono` FOREIGN KEY (`bono_paciente_id`) REFERENCES `bonos_pacientes` (`bono_paciente_id`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_citas_creador` FOREIGN KEY (`creado_por`) REFERENCES `usuarios` (`usuario_id`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_citas_modificador` FOREIGN KEY (`modificado_por`) REFERENCES `usuarios` (`usuario_id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `contratos`
+--
+ALTER TABLE `contratos`
+  ADD CONSTRAINT `fk_contrato_usuario_link` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`usuario_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `empleados`
+--
+ALTER TABLE `empleados`
+  ADD CONSTRAINT `fk_empleado_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`usuario_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Filtros para la tabla `especialidades`
@@ -716,9 +816,9 @@ ALTER TABLE `historiales_medicos`
   ADD CONSTRAINT `fk_hm_paciente` FOREIGN KEY (`paciente_id`) REFERENCES `usuarios` (`usuario_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Filtros para la tabla `horarios`
+-- Filtros para la tabla `horarios_terapeutas`
 --
-ALTER TABLE `horarios`
+ALTER TABLE `horarios_terapeutas`
   ADD CONSTRAINT `fk_horario_creador` FOREIGN KEY (`creado_por`) REFERENCES `usuarios` (`usuario_id`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_horario_fisio` FOREIGN KEY (`fisioterapeuta_id`) REFERENCES `usuarios` (`usuario_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_horario_modificador` FOREIGN KEY (`modificado_por`) REFERENCES `usuarios` (`usuario_id`) ON DELETE SET NULL ON UPDATE CASCADE;
@@ -730,6 +830,12 @@ ALTER TABLE `metodos_pago`
   ADD CONSTRAINT `fk_metodo_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`usuario_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_metodos_creador` FOREIGN KEY (`creado_por`) REFERENCES `usuarios` (`usuario_id`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_metodos_modificador` FOREIGN KEY (`modificado_por`) REFERENCES `usuarios` (`usuario_id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `nominas`
+--
+ALTER TABLE `nominas`
+  ADD CONSTRAINT `fk_nomina_contrato_link` FOREIGN KEY (`contrato_id`) REFERENCES `contratos` (`contrato_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Filtros para la tabla `pacientes`
