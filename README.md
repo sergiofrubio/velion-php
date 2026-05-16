@@ -1,6 +1,6 @@
-# Velion PHP — Sistema ERP para Gestión de Clínicas Médicas 🏥
+# Velion — Sistema de Gestión de Clínicas 🏥
 
-**Velion PHP** es una solución integral de gestión de recursos empresariales (ERP) diseñada específicamente para la administración eficiente de centros médicos. El proyecto destaca por su arquitectura modular basada en el patrón **MVC (Modelo-Vista-Controlador)**, garantizando un código limpio, escalable y fácil de mantener.
+**Velion** es una solución integral de gestión diseñada específicamente para la administración eficiente de centros médicos. El proyecto destaca por su arquitectura modular basada en el patrón **MVC (Modelo-Vista-Controlador)**, garantizando un código limpio, escalable y fácil de mantener, y por su conexión directa con el sistema **Verifactu** de la AEAT y **Contrat@** de la Tesorería General de la Seguridad Social, ahorrando tiempo y dinero en trámites burocráticos.
 
 ---
 
